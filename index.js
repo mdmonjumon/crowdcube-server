@@ -28,7 +28,22 @@ async function run() {
     await client.connect();
 
 
+    // data collections
+    const campaignCollection = client.db('campaignCollectionDB').collection('campaigns')
 
+    app.get('/addCampaign', async (req, res)=>{
+      const result = await campaignCollection.find().toArray();
+      res.send(result);
+    })
+
+    // add new campaign
+    app.post('/addCampaign', async (req, res)=>{
+      const result = await campaignCollection.insertOne(req.body);
+      res.send(result);
+    })
+
+
+  
 
 
 
@@ -39,7 +54,7 @@ async function run() {
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
-    await client.close();
+    // await client.close();
   }
 }
 
