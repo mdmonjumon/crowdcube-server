@@ -30,17 +30,37 @@ async function run() {
 
     // data collections
     const campaignCollection = client.db('campaignCollectionDB').collection('campaigns')
+    const userCollections = client.db('campaignCollectionDB').collection('users')
 
-    app.get('/addCampaign', async (req, res)=>{
+
+    //read all campaign api
+    app.get('/allCampaign', async (req, res)=>{
       const result = await campaignCollection.find().toArray();
       res.send(result);
     })
 
-    // add new campaign
+    // add new campaign api
     app.post('/addCampaign', async (req, res)=>{
       const result = await campaignCollection.insertOne(req.body);
       res.send(result);
     })
+
+
+
+
+    // add new user api
+    app.post('/users', async (req, res)=>{
+      const result = await userCollections.insertOne(req.body);
+      res.send(result);
+    })
+
+    // get all user api
+    app.get('/users', async (req, res)=>{
+      const result = await userCollections.find().toArray();
+      res.send(result)
+    })
+
+
 
 
   
