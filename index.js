@@ -116,6 +116,29 @@ async function run() {
     })
 
 
+    // update campaign
+    app.put('/campaign/:id', async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) }
+      const info = req.body;
+      const option = { upsert: true }
+      const updateInfo = {
+        $set: {
+          photo: info.photo,
+          title: info.title,
+          campaignType: info.campaignType,
+          description: info.description,
+          donateAmount: info.donateAmount,
+          deadline: info.deadline,
+          userEmail: info.userEmail,
+          userName: info.userName,
+        }
+      }
+
+      const result = await campaignCollection.updateOne(filter, updateInfo, option)
+      res.send(result)
+
+    })
 
 
 
