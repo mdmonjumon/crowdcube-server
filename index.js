@@ -8,7 +8,8 @@ app.use(express.json())
 app.use(cors())
 
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.xt5rphe.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
 
@@ -31,31 +32,50 @@ async function run() {
     // data collections
     const campaignCollection = client.db('campaignCollectionDB').collection('campaigns')
     const userCollections = client.db('campaignCollectionDB').collection('users')
+    const donatedCollections = client.db('campaignCollectionDB').collection('donates')
 
 
-    //read all campaign api
-    app.get('/allCampaign', async (req, res)=>{
+    //api for read all campaign
+    app.get('/allCampaign', async (req, res) => {
       const result = await campaignCollection.find().toArray();
       res.send(result);
     })
 
-    // add new campaign api
-    app.post('/addCampaign', async (req, res)=>{
-      const result = await campaignCollection.insertOne(req.body);
-      res.send(result);
+    //api for read single campaign from all campaign fdggfddfsgsdfgsd
+    // app.get('/allCampaign', async (req, res) => {
+    //   const result = await campaignCollection.find().toArray();
+    //   res.send(result);
+    // })
+
+
+    //api for read six running campaign
+    app.get('/runningCampaign', async (req, res) => {
+      const today = new Date().toISOString()
+      const query = { deadline: { $gte: today } }
+      const result = await campaignCollection.find(query).limit(6).toArray()
+      res.send(result)
     })
 
 
 
+    // api for read single campaign data
+    app.get('/campaign/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await campaignCollection.findOne(query);
+      res.send(result);
 
-    // add new user api
-    app.post('/users', async (req, res)=>{
-      const result = await userCollections.insertOne(req.body);
+    })
+
+    // api for read donated data for each user
+    app.get('/donates', async (req, res) => {
+      const result = await donatedCollections.find().toArray();
       res.send(result);
     })
+
 
     // get all user api
-    app.get('/users', async (req, res)=>{
+    app.get('/users', async (req, res) => {
       const result = await userCollections.find().toArray();
       res.send(result)
     })
@@ -63,7 +83,41 @@ async function run() {
 
 
 
-  
+
+
+
+    //api for add new campaign
+    app.post('/addCampaign', async (req, res) => {
+      const result = await campaignCollection.insertOne(req.body);
+      res.send(result);
+    })
+
+    // api for store donated data
+    app.post('/donates', async (req, res) => {
+      const result = await donatedCollections.insertOne(req.body);
+      res.send(result);
+    })
+
+
+    // add new user api
+    app.post('/users', async (req, res) => {
+      const result = await userCollections.insertOne(req.body);
+      res.send(result);
+    })
+
+
+
+    // delete single campaign data from allCampaign
+    app.delete('/campaign/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await campaignCollection.deleteOne(query);
+      res.send(result)
+    })
+
+
+
+
 
 
 
@@ -79,13 +133,13 @@ async function run() {
 }
 
 
-app.get('/', (req, res)=>{
-    res.send('crowdcube server data')
+app.get('/', (req, res) => {
+  res.send('crowdcube server data')
 })
 
 
-app.listen(port, ()=>{
-    console.log(`crowdcube server running on port: ${port}`)
+app.listen(port, () => {
+  console.log(`crowdcube server running on port: ${port}`)
 })
 
 run()
