@@ -25,10 +25,6 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
-
-
     // data collections
     const campaignCollection = client.db('campaignCollectionDB').collection('campaigns')
     const userCollections = client.db('campaignCollectionDB').collection('users')
@@ -41,12 +37,20 @@ async function run() {
       res.send(result);
     })
 
-    //api for read single campaign from all campaign fdggfddfsgsdfgsd
-    // app.get('/allCampaign', async (req, res) => {
-    //   const result = await campaignCollection.find().toArray();
-    //   res.send(result);
-    // })
 
+    // api for get all donation 
+    app.get('/donations', async (req, res) => {
+      const result = await donatedCollections.find().toArray();
+      res.send(result);
+    })
+
+    // api for get single donation 
+    app.get('/donations/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
+      const result = await donatedCollections.findOne(query)
+      res.send(result);
+    })
 
     //api for read six running campaign
     app.get('/runningCampaign', async (req, res) => {
@@ -64,7 +68,6 @@ async function run() {
       const query = { _id: new ObjectId(id) };
       const result = await campaignCollection.findOne(query);
       res.send(result);
-
     })
 
     // api for read donated data for each user
@@ -79,11 +82,6 @@ async function run() {
       const result = await userCollections.find().toArray();
       res.send(result)
     })
-
-
-
-
-
 
 
     //api for add new campaign
@@ -140,18 +138,8 @@ async function run() {
 
     })
 
-
-
-
-
-
-
-    // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
-    // Ensures that the client will close when you finish/error
-    // await client.close();
+
   }
 }
 
@@ -162,7 +150,7 @@ app.get('/', (req, res) => {
 
 
 app.listen(port, () => {
-  console.log(`crowdcube server running on port: ${port}`)
+ 
 })
 
 run()
